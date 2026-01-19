@@ -2,6 +2,7 @@ using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 using System.Collections.Concurrent;
+using System.Text;
 using System.Text.Json;
 
 namespace FactoryWorkflow;
@@ -20,10 +21,10 @@ public sealed class TextOnlyAgentExecutor : Executor<string, string>
 
     // Static collector for step results - ConcurrentQueue preserves FIFO order
     private static readonly ConcurrentQueue<AgentStepResult> _stepResults = new();
-    
+
     // Callback for streaming events - set via SetEventCallback before workflow execution
     private static Func<AgentStepResult, Task>? _onStepCompleted;
-    
+
     public static IEnumerable<AgentStepResult> StepResults => _stepResults.ToArray();
 
     public static void ClearResults()
@@ -83,7 +84,18 @@ public sealed class TextOnlyAgentExecutor : Executor<string, string>
                                     Arguments = SerializeArguments(mcp.Arguments)
                                 });
                             }
-                           else if (content is FunctionCallContent fcc)
+                            else if (content is McpServerToolResultContent mcpr)
+                            {
+                                Console.WriteLine("Received MCPServerToolResultContent ");
+
+                                var matchingCall = agentStep.ToolCalls.LastOrDefault(t => t.CallId == mcpr.CallId);
+                                if (matchingCall != null)
+                                {
+                                    // Extract readable content from the Output (which is List<AIContent>)
+                                    matchingCall.Result = ExtractOutputText(mcpr.Output);
+                                }
+                            }
+                            else if (content is FunctionCallContent fcc)
                             {
                                 agentStep.ToolCalls.Add(new ToolCallInfo
                                 {
@@ -108,14 +120,7 @@ public sealed class TextOnlyAgentExecutor : Executor<string, string>
                                     matchingCall.Result = frc.Result?.ToString()?.Substring(0, Math.Min(500, frc.Result?.ToString()?.Length ?? 0));
                                 }
                             }
-                            else if (content is McpServerToolResultContent mcpr)
-                            {
-                                var matchingCall = agentStep.ToolCalls.LastOrDefault(t => t.CallId == mcpr.CallId);
-                                if (matchingCall != null)
-                                {
-                                    matchingCall.Result = mcpr.Output?.ToString()?.Substring(0, Math.Min(500, mcpr.Output?.ToString()?.Length ?? 0));
-                                }
-                            }
+
 #pragma warning restore MEAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                         }
                     }
@@ -134,7 +139,7 @@ public sealed class TextOnlyAgentExecutor : Executor<string, string>
 
         // Store step result for later collection (ConcurrentQueue preserves order)
         _stepResults.Enqueue(agentStep);
-        
+
         // Notify SSE callback if registered (for streaming progress to frontend)
         if (_onStepCompleted != null)
         {
@@ -151,10 +156,10 @@ public sealed class TextOnlyAgentExecutor : Executor<string, string>
     private static string? SerializeArguments(object? arguments)
     {
         if (arguments == null) return null;
-        
+
         // If it's already a string (pre-serialized JSON), return as-is
         if (arguments is string s) return s;
-        
+
         // Serialize dictionaries and other objects to JSON
         try
         {
@@ -164,5 +169,43 @@ public sealed class TextOnlyAgentExecutor : Executor<string, string>
         {
             return arguments.ToString();
         }
+    }
+
+    /// <summary>
+    /// Extracts readable text from MCP tool output
+    /// </summary>
+    private static string? ExtractOutputText(object? output)
+    {
+        if (output == null) return null;
+
+        StringBuilder result = new();
+
+        // Handle IEnumerable<AIContent> (the actual type of mcpr.Output)
+        if (output is IEnumerable<AIContent> contentList)
+        {
+            var textParts = new List<string>();
+            foreach (var item in contentList)
+            {
+                if (item is TextContent textContent && !string.IsNullOrWhiteSpace(textContent.Text))
+                {
+                    textParts.Add(textContent.Text);
+                }
+                else
+                {
+                    // For other content types, try to serialize to JSON
+                    try
+                    {
+                        var json = JsonSerializer.Serialize(item, new JsonSerializerOptions { WriteIndented = false });
+                        textParts.Add(json);
+                    }
+                    catch
+                    {
+                        textParts.Add(item?.ToString() ?? "");
+                    }
+                }
+            }
+           result.Append(string.Join("\n", textParts));
+        }
+        return result.ToString();
     }
 }
