@@ -101,10 +101,10 @@ The conversation history is injected into the AI prompt as context, so the model
 Both agents are instrumented for **end-to-end observability** so you can debug runs and understand model behavior without adding print statements everywhere.
 
 **What's included:**
-- ✅ **Azure Monitor Integration** - Sends traces to **Application Insights**
-- ✅ **AI Inference Instrumentation** - Automatically traces all AI model calls
-- ✅ **OpenTelemetry Support** - Industry-standard distributed tracing
-- ✅ **Graceful Fallback** - Agents work even if tracing packages aren't installed
+- **Azure Monitor Integration** - Sends traces to **Application Insights**
+- **AI Inference Instrumentation** - Automatically traces all AI model calls
+- **OpenTelemetry Support** - Industry-standard distributed tracing
+- **Graceful Fallback** - Agents work even if tracing packages aren't installed
 
 **What you get in traces:**
 - **Agent execution timeline**: each step (read data, reason, write results)

@@ -38,7 +38,7 @@ You will implement the **Repair Planner Agent** as a .NET application that reads
 ❹ In this exercise, the mappings between faults and required skills/parts are done as a static mapping in `FaultMappingService.cs`. In a real-world application, this would be fetched from another system.
 
 > [!TIP]
-> This is just one way to structure the solution—there are many valid approaches! If you have experience with .NET, feel free to experiment with a different architecture (e.g., dependency injection, separate class libraries, or different layering patterns).
+> This is just one way to structure the solution—there are many valid approaches! If you have experience with .NET, feel free to experiment with a different architecture (e.g., dependency injection, separate class libraries, or different layering patterns). The goal, though, is to have *GitHub Copilot* write the majority of the code while you provide guidance and review.
 
 The following mappings are used in this exercise. The `agentplanning` agent already knows these mappings, so you don't need to copy them manually.
 
@@ -436,7 +436,7 @@ NumberHandling = JsonNumberHandling.AllowReadingFromString
 </details>
 
 <details>
-<summary>Problem: **Cosmos DB** errors</summary>
+<summary>Problem: Cosmos DB errors</summary>
 
 Ensure you're using both `[JsonPropertyName]` and `[JsonProperty]` attributes on models.
 
@@ -484,7 +484,7 @@ We used .NET (C#) in this challenge and Python in the previous one — both are 
 This repo uses **VS Code** Copilot customization so the agent behaves consistently during the workshop.
 
 > [!TIP]
-> Using guided agents (clear instructions + constrained tools + repeatable steps) helps avoid “vibe coding”, where solutions can drift, skip requirements, or become hard to review. A lightweight, guided approach keeps changes aligned with the goal and makes agent output easier to validate.
+> Using guided agents (clear instructions + constrained tools + repeatable steps) is an improvement over pure *vibe coding*, where solutions can drift, skip requirements, or become hard to review. A lightweight, guided approach keeps changes aligned with the goal and makes agent output easier to validate.
 
 
 <img src="./images/challenge-2-copilot-instructions.png" alt="GitHub Copilot instructions" width="50%">

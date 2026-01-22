@@ -68,7 +68,7 @@ The factory process spans many systems, teams, and areas of responsibility. Agen
 
 In this hackathon you’ll build multiple agent applications (Python and .NET) and connect them using a sequential workflow in the **Microsoft Agent Framework**. The workflow itself is described in the scenario section above; the focus here is the supporting platform components.
 
-The image below illustrates the reference architecture used throughout the hackathon.
+The image below illustrates the architecture used throughout the hackathon.
 
 ![Factory Hackathon Architecture](./images/hackathon-architecture.png)
 

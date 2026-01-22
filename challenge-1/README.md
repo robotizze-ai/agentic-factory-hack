@@ -385,7 +385,7 @@ The machine wiki contains knowledge (common issues, repair instructions and repa
 Create a knowledge source and knowledge base by following the steps in the [create_knowledge_base.ipynb](./create_knowledge_base.ipynb) notebook.
 
 > [!TIP]
-> When running the notebook you will be asked to select an environment. Pick the Pyton 3.11.x environment`
+> When running the notebook you will be asked to select an environment. Pick the user-installed Python environment
 >
 > <img src="./images/challenge-1-select-python-environment.png" alt="Select Python environment" width="30%">
 >
